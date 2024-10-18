@@ -2,18 +2,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { RootStackParam } from "../types";
 import Home from "../views/Home";
+import AddFood from "../views/AddFood";
 import About from "../views/About";
 
 const Stack = createNativeStackNavigator<RootStackParam>();
 
 const routeScreenDefinitions = {
-  headerStyle: {
-    backgroundColor: "rgba(7,26,93,255)",
-  },
-  headerTintColor: "white",
-  headerTitleStyle: {
-    fontWeight: "bold",
-  },
+  headerShown: false,
 };
 const Routes = () => {
   return (
@@ -22,6 +17,11 @@ const Routes = () => {
         <Stack.Screen
           name="Home"
           component={Home}
+          options={routeScreenDefinitions}
+        />
+        <Stack.Screen
+          name="AddFood"
+          component={AddFood}
           options={routeScreenDefinitions}
         />
         <Stack.Screen

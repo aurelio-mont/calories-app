@@ -1,9 +1,27 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { StyleSheet, View, Text, Modal } from "react-native";
 import { AddFoodModalProps } from "../../types";
 import { Button, Icon, Input } from "@rneui/themed";
 
 const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
+  const [calories, setCalories] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [portion, setPortion] = useState<string>("");
+
+  const resetValues = () => {
+    setCalories("");
+    setName("");
+    setPortion("");
+  };
+
+  useEffect(() => {
+    resetValues;
+  }, [visible]);
+
+  const handleAddPress = () => {
+    onClose();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -22,23 +40,29 @@ const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
           </View>
           <View style={styles.formItem}>
             <View style={styles.inputContainer}>
-              <Input />
+              <Input
+                value={calories}
+                onChangeText={(text) => setCalories(text)}
+              />
             </View>
             <View style={styles.legendContainer}>
-              <Text style={styles.legend}>KCal</Text>
+              <Text style={styles.legend}>Calorias</Text>
             </View>
           </View>
           <View style={styles.formItem}>
             <View style={styles.inputContainer}>
-              <Input />
+              <Input value={name} onChangeText={(text) => setName(text)} />
             </View>
             <View style={styles.legendContainer}>
-              <Text style={styles.legend}>Nomre</Text>
+              <Text style={styles.legend}>Nombre</Text>
             </View>
           </View>
           <View style={styles.formItem}>
             <View style={styles.inputContainer}>
-              <Input />
+              <Input
+                value={portion}
+                onChangeText={(text) => setPortion(text)}
+              />
             </View>
             <View style={styles.legendContainer}>
               <Text style={styles.legend}>Porción</Text>
@@ -50,6 +74,12 @@ const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
               color={"success"}
               radius={"lg"}
               icon={<Icon name="add" color={"white"} />}
+              onPress={handleAddPress}
+              disabled={
+                calories.trim() === "" ||
+                name.trim() === "" ||
+                portion.trim() === ""
+              }
             />
           </View>
         </View>

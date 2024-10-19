@@ -1,8 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 import Header from "../../components/Header";
 import { Button, Icon, Input } from "@rneui/themed";
+import AddFoodModal from "../../components/AddFoodModal";
+import { useState } from "react";
 
 const AddFood = () => {
+  const [visible, setVisible] = useState<boolean>(false);
+  const handleModalClose = () => setVisible(false);
   return (
     <View style={styles.container}>
       <Header />
@@ -15,6 +19,7 @@ const AddFood = () => {
             icon={<Icon name="add-circle-outline" color={"white"} />}
             radius={"lg"}
             color={"success"}
+            onPress={() => setVisible(true)}
           />
         </View>
       </View>
@@ -30,6 +35,7 @@ const AddFood = () => {
           titleStyle={styles.searchBtnTitle}
         />
       </View>
+      <AddFoodModal visible={visible} onClose={handleModalClose} />
     </View>
   );
 };

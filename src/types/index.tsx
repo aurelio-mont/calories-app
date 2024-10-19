@@ -3,3 +3,8 @@ export type RootStackParam = {
   AddFood: undefined;
   About: undefined;
 };
+
+export type AddFoodModalProps = {
+  onClose: () => void;
+  visible: boolean;
+};

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Header from "../../components/Header";
 import { Button, Icon, Input } from "@rneui/themed";
 import AddFoodModal from "../../components/AddFoodModal";
@@ -6,7 +6,12 @@ import { useState } from "react";
 
 const AddFood = () => {
   const [visible, setVisible] = useState<boolean>(false);
-  const handleModalClose = () => setVisible(false);
+  const handleModalClose = (shouldUpdate?: boolean) => {
+    if (shouldUpdate) {
+      Alert.alert("Se agrego el alimento correctamente");
+    }
+    setVisible(false);
+  };
   return (
     <View style={styles.container}>
       <Header />

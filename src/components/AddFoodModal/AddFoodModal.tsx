@@ -2,11 +2,14 @@ import { FC, useEffect, useState } from "react";
 import { StyleSheet, View, Text, Modal } from "react-native";
 import { AddFoodModalProps } from "../../types";
 import { Button, Icon, Input } from "@rneui/themed";
+import useFoodStorage from "../../hooks/useFoodStorage";
 
 const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
   const [calories, setCalories] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [portion, setPortion] = useState<string>("");
+
+  const { onSaveFood } = useFoodStorage();
 
   const resetValues = () => {
     setCalories("");
@@ -18,14 +21,19 @@ const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
     resetValues;
   }, [visible]);
 
-  const handleAddPress = () => {
-    onClose();
+  const handleAddPress = async () => {
+    try {
+      await onSaveFood({ calories, name, portion });
+      onClose(true);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <Modal
       visible={visible}
-      onRequestClose={onClose}
+      onRequestClose={() => onClose()}
       transparent
       animationType="slide"
     >
@@ -34,7 +42,7 @@ const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
           <View style={styles.closeBtnContainer}>
             <Button
               icon={<Icon name="close" size={28} />}
-              onPress={onClose}
+              onPress={() => onClose()}
               type="clear"
             />
           </View>

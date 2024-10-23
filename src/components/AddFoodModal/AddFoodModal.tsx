@@ -11,14 +11,10 @@ const AddFoodModal: FC<AddFoodModalProps> = ({ onClose, visible }) => {
 
   const { onSaveFood } = useFoodStorage();
 
-  const resetValues = () => {
+  useEffect(() => {
     setCalories("");
     setName("");
     setPortion("");
-  };
-
-  useEffect(() => {
-    resetValues;
   }, [visible]);
 
   const handleAddPress = async () => {

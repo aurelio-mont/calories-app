@@ -1,5 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { Meal } from "../types";
+import { isToday } from "date-fns";
 
 const MY_FOOD_KEY = "@MyFood:Key";
 const MY_TODAY_FOOD_KEY = "@MyTodayFood:Key";
@@ -36,9 +38,10 @@ const useFoodStorage = () => {
     }
   };
 
-  const handleSaveTodayFood = async ({ name, portion, calories }: Meal) => {
+  const handleSaveTodayFood = async ({ id, name, portion, calories }: Meal) => {
     try {
       const result = await saveInfoToStorage(MY_TODAY_FOOD_KEY, {
+        id,
         name,
         portion,
         calories,
@@ -67,10 +70,29 @@ const useFoodStorage = () => {
     try {
       const foods = await AsyncStorage.getItem(MY_TODAY_FOOD_KEY);
       if (foods !== null) {
-        const parsedFoods = JSON.parse(foods);
-        return Promise.resolve(parsedFoods);
+        const parsedFoods = JSON.parse(foods) as Meal[];
+
+        const filteredFoods = parsedFoods.filter(
+          (item) => item.date && isToday(new Date(item.date))
+        );
+        return Promise.resolve(filteredFoods);
       }
       return Promise.resolve([]);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const handleRemoveTodayFoods = async (id: string) => {
+    try {
+      const todayFoods = await handleGetTodayFoods();
+      const filteredFoods = todayFoods?.filter((item: Meal) => item.id !== id);
+      await AsyncStorage.setItem(
+        MY_TODAY_FOOD_KEY,
+        JSON.stringify(filteredFoods)
+      );
+
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -81,6 +103,7 @@ const useFoodStorage = () => {
     onSaveTodayFood: handleSaveTodayFood,
     onGetFoods: handleGetFoods,
     onGetTodayFoods: handleGetTodayFoods,
+    onRemoveTodayFoods: handleRemoveTodayFoods,
   };
 };
 

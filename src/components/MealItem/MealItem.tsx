@@ -1,15 +1,31 @@
 import { FC } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { Meal } from "../../types";
+import { MealItemProps } from "../../types";
 import { Button, Icon } from "@rneui/themed";
 import useFoodStorage from "../../hooks/useFoodStorage";
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 
-const MealItem: FC<Meal> = ({ name, portion, calories }) => {
-  const { onSaveTodayFood } = useFoodStorage();
-  const handleAddItemPress = async () => {
+const MealItem: FC<MealItemProps> = ({
+  id = "",
+  name,
+  portion,
+  calories,
+  isAbleToAdd,
+  onCompleteAddRemove,
+}) => {
+  const { onSaveTodayFood, onRemoveTodayFoods } = useFoodStorage();
+  const handleIconPress = async () => {
     try {
-      await onSaveTodayFood({ name, portion, calories });
-      Alert.alert("Se agrego el alimento al dia");
+      if (isAbleToAdd) {
+        id = uuidv4();
+        await onSaveTodayFood({ id, name, portion, calories });
+        Alert.alert("Se agrego el alimento al dia");
+      } else {
+        await onRemoveTodayFoods(id);
+        Alert.alert("Se elimino el alimento del dia");
+      }
+      onCompleteAddRemove?.();
     } catch (error) {
       console.error(error);
       Alert.alert("No se pudo agregar el alimento al dia");
@@ -25,8 +41,16 @@ const MealItem: FC<Meal> = ({ name, portion, calories }) => {
         <Button
           style={styles.iconButton}
           type="clear"
-          icon={<Icon name="add-circle-outline" />}
-          onPress={handleAddItemPress}
+          icon={
+            <Icon
+              name={
+                isAbleToAdd ? "add-circle-outline" : "remove-circle-outline"
+              }
+              color={"black"}
+              size={24}
+            />
+          }
+          onPress={handleIconPress}
         />
         <Text style={styles.calories}>{calories} cal</Text>
       </View>

@@ -82,7 +82,11 @@ const AddFood = () => {
       </View>
       <ScrollView style={styles.content}>
         {foods?.map((meal, index) => (
-          <MealItem key={`my-meal-item-${index}`} {...meal} />
+          <MealItem
+            key={`my-meal-item-${index}-${meal.name}`}
+            {...meal}
+            isAbleToAdd={true}
+          />
         ))}
       </ScrollView>
       <AddFoodModal visible={visible} onClose={handleModalClose} />

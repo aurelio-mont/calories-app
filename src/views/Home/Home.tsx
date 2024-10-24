@@ -3,19 +3,50 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StyleSheet, Text, View } from "react-native";
 import Header from "../../components/Header";
 import { Button, Icon } from "@rneui/themed";
-import { Meal, RootStackParam } from "../../types";
+import { Meal, RootStackParam, TodayCaloriesProps } from "../../types";
 import useFoodStorage from "../../hooks/useFoodStorage";
 import { useCallback, useState } from "react";
+import TodayCalories from "../../components/TodayCalories";
+import TodayMeals from "../../components/TodayMeals";
+
+const totalCaloriesPerDay = 2000;
 
 const Home = () => {
+  const [todayStatistics, setTodayStatistics] = useState<TodayCaloriesProps>({
+    consumed: 0,
+    remaining: 0,
+    percentage: 0,
+    total: totalCaloriesPerDay,
+  });
   const [todayFoods, setTodayFoods] = useState<Meal[]>([]);
   const { onGetTodayFoods } = useFoodStorage();
   const { navigate } =
     useNavigation<NativeStackNavigationProp<RootStackParam, "Home">>();
 
+  const calculateStatistics = (meals: Meal[]) => {
+    try {
+      const caloriesConsumed = meals.reduce(
+        (acc, meal) => acc + Number(meal.calories),
+        0
+      );
+      const remainingCalories = totalCaloriesPerDay - caloriesConsumed;
+      const percentage = (caloriesConsumed / totalCaloriesPerDay) * 100;
+
+      setTodayStatistics({
+        consumed: caloriesConsumed,
+        remaining: remainingCalories,
+        percentage,
+        total: totalCaloriesPerDay,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const loadTodayFoods = useCallback(async () => {
     try {
-      const result = await onGetTodayFoods();
+      const result = (await onGetTodayFoods()) as Meal[];
+      calculateStatistics(result);
       setTodayFoods(result);
     } catch (error) {
       setTodayFoods([]);
@@ -32,7 +63,6 @@ const Home = () => {
     navigate("AddFood");
   };
 
-  console.log(todayFoods);
   return (
     <View style={styles.container}>
       <Header />
@@ -49,6 +79,8 @@ const Home = () => {
           />
         </View>
       </View>
+      <TodayCalories {...todayStatistics} />
+      <TodayMeals meals={todayFoods} onCompleteAddRemove={loadTodayFoods} />
     </View>
   );
 };
